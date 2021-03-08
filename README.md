@@ -11,7 +11,7 @@ I decided to rely on the professionals who knows how to setup the process effici
 - _stability_ even if the internet connection is unstable
 - _freedom_ to deploy the same service on my own virtual machine or on Google Cloud or AWS
 - _responsiveness_ while uploading the files
-- _security_ is admittedly not out of the box but it is possible to inject it where necessary
+- _security_ is admittedly not out of the box, but it is possible to inject it where necessary
 - _documentation_ and _examples_ in different programming languages
 
 ## Scope of this article
@@ -157,7 +157,7 @@ store := gcsstore.New("my-bucket", &gcsstore.GCSService{
 })
 ```
 
-For the purpose of simplicity create _my-bucket_ through the Google Console like we did it with the folder _./uploads_. It must exists before we start testing.
+For the purpose of simplicity create _my-bucket_ through the Google Console like we did it with the folder _./uploads_. It must exist before we start testing.
 
 That is all! Let us try again with the same _curl -XPOST_ we tried earlier with and see that it works (assuming your cloud key and bucket are intact)
 
@@ -196,7 +196,7 @@ func checkJWT(authorizationHeader string) error {
 }
 ```
 
-If we try with _curl -XPOST_ again, the request fails with _401 Unauthorized_, but by sending the header `-H "Authorization: Bearer FalseJWT"`with the request it succeeded again.
+If we try with _curl -XPOST_ again, the request fails with _401 Unauthorized_, but by sending the header `-H "Authorization: Bearer FalseJWT"` with the request it succeeded again.
 
 ## Creating a Metadata for a file
 
@@ -220,7 +220,7 @@ Tus always creates an _.info_ to every uploaded file. Let's take a closer look t
 }
 ```
 
-_MetaData_ is empty, but we can use it to our benefit. We don't normally want to lose the original name of the file or the identity of user who has uploaded the file. _Metadata_ comes to our help where we can inject additional information and store it schemaless as we please.
+_MetaData_ is empty, but we can use it to our benefit. We don't normally want to lose the original name of the file or the identity of user who has uploaded the file. _Metadata_ comes to our help where we can inject additional information and store it schemeless as we please.
 
 Apart from a lot of different flags the structure _tus.Config{}_ offers a way to implement callback functions. _PreUploadCreateCallback_ is called before an upload starts and an appropriate place to create the _MetaData_:
 
@@ -236,7 +236,7 @@ handler, err := tusd.NewHandler(tusd.Config{
 })
 ```
 
-As you probably see the filename has to be sent via _curl_ as a header. Therefore we put one more header to the _POST_:
+As you probably see the filename has to be sent via _curl_ as a header. Therefore, we put one more header to the _POST_:
 
 ```bash
 > curl -XPOST http://localhost:8080/files/ \
@@ -313,4 +313,6 @@ public void downloadFile(final String urlPath) throws MalformedURLException, IOE
 }
 ```
 
-That is all what you have to know for a smooth start with tus protocol. If you want to download the Go example, we used here, visit us on [github.com]().
+That is all what you have to know for a smooth start with the tus protocol. If you want to download the Go example, we used here, visit us on [github.com](https://github.com/setlog/tus-example).
+
+Happy uploading!
