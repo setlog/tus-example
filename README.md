@@ -1,16 +1,18 @@
 # Up- and download files using tus protocol
 
+![tus](images/intro.png "Tus")
+
 ## What is tus und why using it at all?
 
-Sooner or later every developer bumps into a project where there is a task to deal with documents that have to be uploaded or downloaded from a host. If there is a suitable library in the framework at hand, they grab it which is of course advisable. But if there isn't, many say: "It cannot be as difficult. Just use HTTP or FTP and have fun." 
+Sooner or later every developer bumps into a project where there is a task to deal with online documents. If there is a suitable library in the framework at hand, they grab it which is of course advisable. But if there isn't, many might say: "It cannot be as difficult. Just use HTTP or FTP and have fun." 
 
-The fun wears off, if the internet connection gets broken, or the product owner suddenly wants to pause the upload process, or the infrastructure moves from one cloud provider to another, or there is more than one programming language on the client side, or... well, you've got the idea.
+The fun wears off, if the internet connection gets broken, or the product owner suddenly wants to pause the upload process, or the infrastructure moves from one cloud provider to another, or there is more than one programming language on the client side etc.
 
 I decided to rely on the professionals who knows how to setup the process efficiently and my choice fell on the [tus project](https://tus.io/). It promised everything I needed:
 
 - _stability_ even if the internet connection is unstable
-- _freedom_ to deploy the same service on my own virtual machine or on Google Cloud or AWS
-- _responsiveness_ while uploading the files
+- _freedom_ where to deploy the service, be it on my own virtual machine or on Google Cloud or AWS
+- _responsiveness_ while uploading the file
 - _security_ is admittedly not out of the box, but it is possible to inject it where necessary
 - _documentation_ and _examples_ in different programming languages
 
@@ -96,7 +98,7 @@ As you can see we created the folder _uploads_ because it is what we have as a s
 store := filestore.FileStore{ Path: "./uploads" }
 ```
 
-_curl_ receives a lot of headers that are a bare minimum and essential for the successful upload.
+_curl_ in our example receives several headers that are a bare minimum and essential for the successful upload.
 
 Now you will find two files under _./uploads_: one with the original content and another with the extension _.info_ and the metadata:
 
@@ -115,9 +117,9 @@ this is my owesome data
 
 That was simple enough, wasn't it?
 
-## Uploading files to Google Cloud
+## Uploading files to the Google Cloud
 
-Now we adopt the example to upload the files onto Google Cloud. I assume that you are familiar with the basic Cloud concepts and omit the part with getting access to it. You need at least a service account key with the permission to read and write files to the bucket. Let assume you have generated this key and saved it into the file _google-credentials.json_ Put this filename into the environment variable in _main.go_ and create the client to operate with the bucket:
+Now we adopt the example to upload the files to the Google Cloud. I assume that you are familiar with the basic Cloud concepts and omit the part with getting access to it. You need at least a service account key with the permission to read and write files to the bucket. Let us assume you have generated this key and saved it into the file _google-credentials.json_ Put this filename into the environment variable in _main.go_ and create the client to operate with the bucket:
 
 ```go
 import (
@@ -159,13 +161,13 @@ store := gcsstore.New("my-bucket", &gcsstore.GCSService{
 
 For the purpose of simplicity create _my-bucket_ through the Google Console like we did it with the folder _./uploads_. It must exist before we start testing.
 
-That is all! Let us try again with the same _curl -XPOST_ we tried earlier with and see that it works (assuming your cloud key and bucket are intact)
+That is all! Let us try again with the same _curl -XPOST_ we tried earlier and see that it works (assuming your cloud key and bucket are intact)
 
 ![My Bucket](images/my-bucket.png "My Bucket")
 
 ## JWT check
 
-I find it a better architecture pattern to delegate the JWT check to the API Gateway. However, it is not always possible and not the only right way to authorize the request. Let's see how to do it in our Go program.
+I consider it a better architecture pattern to delegate the JWT check to the API Gateway. However, it is not always possible and not the only right way to authorise a request. Let's see how to do it in our Go program.
 
 Tus package has a convenient way to integrate a middleware in an HTTP handler. We are going to use it for checking the header _Authorization_.
 
@@ -196,7 +198,7 @@ func checkJWT(authorizationHeader string) error {
 }
 ```
 
-If we try with _curl -XPOST_ again, the request fails with _401 Unauthorized_, but by sending the header `-H "Authorization: Bearer FalseJWT"` with the request it succeeded again.
+If we try with _curl -XPOST_ again, the request fails with _401 Unauthorized_, but by sending the header `-H "Authorization: Bearer FalseJWT"` with the request it succeeds again.
 
 ## Creating a Metadata for a file
 
@@ -222,7 +224,7 @@ Tus always creates an _.info_ to every uploaded file. Let's take a closer look t
 
 _MetaData_ is empty, but we can use it to our benefit. We don't normally want to lose the original name of the file or the identity of user who has uploaded the file. _Metadata_ comes to our help where we can inject additional information and store it schemeless as we please.
 
-Apart from a lot of different flags the structure _tus.Config{}_ offers a way to implement callback functions. _PreUploadCreateCallback_ is called before an upload starts and an appropriate place to create the _MetaData_:
+Apart from a lot of different flags the structure _tus.Config{}_ offers a way to implement callback functions. _PreUploadCreateCallback_ is called before an upload starts and it is an appropriate place to create the _MetaData_:
 
 ```go
 handler, err := tusd.NewHandler(tusd.Config{
@@ -236,7 +238,7 @@ handler, err := tusd.NewHandler(tusd.Config{
 })
 ```
 
-As you probably see the filename has to be sent via _curl_ as a header. Therefore, we put one more header to the _POST_:
+As you probably see the filename has to be sent via _curl_ in a header. Therefore, we put one more header to the _POST_ command:
 
 ```bash
 > curl -XPOST http://localhost:8080/files/ \
@@ -270,7 +272,7 @@ That should create a new field in _MetaData_ (see _.info_):
 
 ## Tus client with Java
 
-Now let us take a look on the other side of the bank: the tus client. I would like to switch to Java to have more fun by using another programming language.
+Now let us take a look at the other side of the bank: the tus client. I would like to switch to Java to have more fun by using another programming language.
 
 There is a very good example of the file upload on [github.com](https://github.com/tus/tus-java-client) I could get along with. However, there is one topic that has been left out: mandatory headers. In order to get this example working I needed to override one function of _TusClient_ and pass additional headers with the request.
 
@@ -290,7 +292,7 @@ private TusClient tusClient = new TusClient() {
 };
 ```
 
-For the download you can use the standard Java libraries, but do not forget the headers here as well:
+For the download you can use the standard Java libraries, but do not forget the headers as well:
 
 ```java
 // urlPath is the content of "Location" header that has been sent back with the response while the file was being uploaded
