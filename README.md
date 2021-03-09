@@ -1,7 +1,5 @@
 # Up- and download files using tus protocol
 
-![tus](images/intro.png "Tus")
-
 ## What is tus und why using it at all?
 
 Sooner or later every developer bumps into a project where there is a task to deal with online documents. If there is a suitable library in the framework at hand, they grab it which is of course advisable. But if there isn't, many might say: "It cannot be as difficult. Just use HTTP or FTP and have fun." 
